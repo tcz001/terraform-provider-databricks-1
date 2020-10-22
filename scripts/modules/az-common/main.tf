@@ -33,7 +33,7 @@ locals {
 
 resource "azurerm_resource_group" "example" {
   name     = "${local.prefix}-rg"
-  location = "westeurope"
+  location = "eastus2"
   tags     = local.tags
 }
 
@@ -138,9 +138,12 @@ resource "azurerm_key_vault" "example" {
   location                 = azurerm_resource_group.example.location
   resource_group_name      = azurerm_resource_group.example.name
   tenant_id                = data.azurerm_client_config.current.tenant_id
-  soft_delete_enabled      = false
+  soft_delete_enabled      = true
   purge_protection_enabled = false
-  sku_name                 = "standard"
+  sku_name                 = "premium"
+  enabled_for_deployment = true
+  enabled_for_disk_encryption = true
+  enabled_for_template_deployment = true
   tags                     = local.tags
 
   access_policy {
