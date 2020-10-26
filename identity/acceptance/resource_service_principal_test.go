@@ -1,10 +1,14 @@
 package acceptance
 
 import (
-	"testing"
+	"fmt"
 	"os"
+	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/databrickslabs/databricks-terraform/common"
+	"github.com/databrickslabs/databricks-terraform/internal/acceptance"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccServicePrincipalResource(t * testing.T) {
@@ -17,12 +21,13 @@ func TestAccServicePrincipalResource(t * testing.T) {
 	acceptance.AccTest(t, resource.TestCase{
 		Steps: []resource.TestStep{
 			{
-				Config: createServicePrincipal()
-			}
-		}
-		Check: resource.ComposeTestCheckFunc(
-			testServicePrincipalResourceExists("databricks_service_principal.sp", &sp, t))
-		)
+				Config: createServicePrincipal(),
+				Check: resource.ComposeTestCheckFunc(
+					testServicePrincipalResourceExists("databricks_service_principal.sp", &servicePrincipal, t),
+				),
+				Destroy: false,
+			},
+		},
 	})
 }
 
@@ -40,13 +45,14 @@ func testServicePrincipalResourceExists(key string, sp *ScimServicePrincipal, t 
 		if !ok {
 			return fmt.Errorf("Not found: %s", key)
 		}
+		return nil
 	}
 
 	conn := common.CommonEnvironmentClient()
-	resp, err :=  NewServicePrisdfncipalsAPI(conn).Read(rs.Primary.ID)
+	resp, err :=  NewServicePrincipalsAPI(conn).Read(sp.Primary.ID)
 	if err != nil {
 		return err
 	}
 	*sp =  resp
-	return nill
+	return nil
 }
